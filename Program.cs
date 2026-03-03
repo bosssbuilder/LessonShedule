@@ -4,7 +4,7 @@
     {
         static void Main(string[] args)
         {
-            string test_data = "Lesson 2024-03-05 A101 Ivanov Ivan Ivanovich";
+            string test_data = "Lesson 2024-03-05 A101 Ivanov Ivan Ivanovich Red";
 
             Logic logic = new Logic();
 
