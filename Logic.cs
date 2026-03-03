@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace LessonSchedule
@@ -19,9 +20,13 @@ namespace LessonSchedule
 
                 DateTime date = DateTime.Parse(finalValues[0].Trim());
                 string audience = finalValues[1].Trim();
-                string teacher = string.Join(" ", finalValues.Skip(2));
+                string color = finalValues.Last().Trim();
+                string teacher = string.Join(" ", finalValues.Skip(2).Take(finalValues.Count - 3));
 
-                return new Lesson(date, audience, teacher);
+                var lesson = new Lesson(date, audience, teacher);
+                lesson.Color = color;
+
+                return lesson;
             }
             catch (Exception ex)
             {
@@ -31,7 +36,7 @@ namespace LessonSchedule
 
         public void PrintLesson(Lesson lesson)
         {
-            Console.WriteLine($"Date: {lesson.Date:yyyy-MM-dd}; Audience: {lesson.Audience}; Teacher: {lesson.Teacher}");
+            Console.WriteLine($"Date: {lesson.Date:yyyy-MM-dd}; Audience: {lesson.Audience}; Teacher: {lesson.Teacher}; Color: {lesson.Color}");
         }
     }
 }

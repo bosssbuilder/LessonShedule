@@ -7,6 +7,11 @@ namespace LessonSchedule
     {
         static void Main(string[] args)
         {
+<<<<<<< HEAD
+=======
+            string test_data = "Lesson 2024-03-05 A101 Ivanov Ivan Ivanovich Red";
+
+>>>>>>> color
             Logic logic = new Logic();
             List<Lesson> lessons = new List<Lesson>();
 
