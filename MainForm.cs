@@ -1,26 +1,30 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace LessonScheduleNew
 {
-    public partial class MainForm : Form
+    public class MainForm : Form
     {
-        private LessonService _service = new LessonService();
+        private readonly LessonService _service;
         private DataGridView _dataGridView;
-        private Button _btnLoad, _btnAdd, _btnDelete;
+        private Button _btnLoad;
+        private Button _btnAdd;
+        private Button _btnDelete;
         private Label _lblStatus;
 
         public MainForm()
         {
+            _service = new LessonService();
             SetupUI();
             _service.DataChanged += (s, e) => RefreshGrid();
         }
 
         private void SetupUI()
         {
-            this.Text = "Учебные занятия - Вариант 9";
-            this.Size = new Size(750, 550);
+            Text = "Учебные занятия - Вариант 9";
+            Size = new Size(750, 550);
 
             _dataGridView = new DataGridView
             {
@@ -35,19 +39,22 @@ namespace LessonScheduleNew
             _dataGridView.Columns.Add("Audience", "Аудитория");
             _dataGridView.Columns.Add("Teacher", "Преподаватель");
 
-            var topPanel = new Panel { Dock = DockStyle.Top, Height = 40 };
+            Panel topPanel = new Panel { Dock = DockStyle.Top, Height = 40 };
+
             _btnLoad = new Button
             {
                 Text = "Загрузить из файла",
                 Location = new Point(10, 8),
                 Size = new Size(150, 28)
             };
+
             _btnAdd = new Button
             {
                 Text = "Добавить",
                 Location = new Point(170, 8),
                 Size = new Size(100, 28)
             };
+
             _btnDelete = new Button
             {
                 Text = "Удалить",
@@ -70,9 +77,9 @@ namespace LessonScheduleNew
                 BackColor = Color.LightGray
             };
 
-            this.Controls.Add(_dataGridView);
-            this.Controls.Add(topPanel);
-            this.Controls.Add(_lblStatus);
+            Controls.Add(_dataGridView);
+            Controls.Add(topPanel);
+            Controls.Add(_lblStatus);
         }
 
         private void RefreshGrid()
@@ -86,53 +93,53 @@ namespace LessonScheduleNew
             _lblStatus.Text = $"Всего записей: {lessons.Count}";
         }
 
-        private void BtnLoad_Click(object sender, EventArgs e)
+        private void BtnLoad_Click(object? sender, EventArgs e)
         {
-            using (OpenFileDialog ofd = new OpenFileDialog())
+            using OpenFileDialog ofd = new OpenFileDialog
             {
-                ofd.Filter = "Text files|*.txt|All files|*.*";
-                ofd.Title = "Выберите файл с данными";
+                Filter = "Text files|*.txt|All files|*.*",
+                Title = "Выберите файл с данными"
+            };
 
-                if (ofd.ShowDialog() == DialogResult.OK)
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                try
                 {
-                    try
-                    {
-                        var (lessons, errors) = LessonParser.LoadFromFileWithLog(ofd.FileName);
-                        _service.SetLessons(lessons);
+                    (List<Lesson> lessons, List<ParseError> errors) = LessonParser.LoadFromFileWithLog(ofd.FileName);
+                    _service.SetLessons(lessons);
 
-                        if (errors.Count > 0)
-                        {
-                            string errorMsg = $"Загружено {lessons.Count} записей.\nПропущено строк с ошибками: {errors.Count}\n\nПервые 5 ошибок:\n";
-                            for (int i = 0; i < Math.Min(5, errors.Count); i++)
-                            {
-                                errorMsg += $"Строка {errors[i].LineNumber}: {errors[i].ErrorMessage}\n   -> \"{errors[i].Line}\"\n";
-                            }
-                            MessageBox.Show(errorMsg, "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        }
-                        else
-                        {
-                            MessageBox.Show($"Загружено {lessons.Count} записей.", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                    }
-                    catch (Exception ex)
+                    if (errors.Count > 0)
                     {
-                        MessageBox.Show($"Ошибка загрузки файла: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        string errorMsg = $"Загружено {lessons.Count} записей.\nПропущено строк с ошибками: {errors.Count}\n\nПервые 5 ошибок:\n";
+                        for (int i = 0; i < Math.Min(5, errors.Count); i++)
+                        {
+                            errorMsg += $"Строка {errors[i].LineNumber}: {errors[i].ErrorMessage}\n   -> \"{errors[i].Line}\"\n";
+                        }
+                        MessageBox.Show(errorMsg, "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
+                    else
+                    {
+                        MessageBox.Show($"Загружено {lessons.Count} записей.", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка загрузки файла: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
 
-        private void BtnAdd_Click(object sender, EventArgs e)
+        private void BtnAdd_Click(object? sender, EventArgs e)
         {
-            var dialog = new AddLessonDialog();
-            if (dialog.ShowDialog() == DialogResult.OK)
+            using AddLessonDialog dialog = new AddLessonDialog();
+            if (dialog.ShowDialog() == DialogResult.OK && dialog.Lesson is not null)
             {
                 _service.Add(dialog.Lesson);
                 MessageBox.Show("Занятие добавлено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
-        private void BtnDelete_Click(object sender, EventArgs e)
+        private void BtnDelete_Click(object? sender, EventArgs e)
         {
             if (_dataGridView.SelectedRows.Count == 0)
             {
@@ -148,6 +155,19 @@ namespace LessonScheduleNew
                     MessageBox.Show("Запись удалена", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _dataGridView?.Dispose();
+                _btnLoad?.Dispose();
+                _btnAdd?.Dispose();
+                _btnDelete?.Dispose();
+                _lblStatus?.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }
