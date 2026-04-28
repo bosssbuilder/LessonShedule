@@ -26,9 +26,11 @@ namespace LessonScheduleNew
             if (parts.Length < 3)
                 throw new ArgumentException($"Недостаточно данных: получено {parts.Length} частей");
 
+            // Дата
             if (!DateTime.TryParseExact(parts[0], "yyyy.MM.dd", null, DateTimeStyles.None, out var date))
                 throw new ArgumentException($"Неверный формат даты: {parts[0]}");
 
+            // Аудитория
             string audience = parts[1];
 
             if (string.IsNullOrWhiteSpace(audience) ||
@@ -37,12 +39,29 @@ namespace LessonScheduleNew
                 throw new ArgumentException($"Неверный формат аудитории: {audience}");
             }
 
+            // Преподаватель (по умолчанию всё после аудитории)
             string teacher = string.Join(" ", parts, 2, parts.Length - 2);
 
+            // Quality по умолчанию
+            string quality = "хорошо";
+
+            // Проверяем, есть ли качество (ТОЛЬКО если это реально слово качества)
+            if (parts.Length > 3)
+            {
+                string last = parts[^1].ToLower();
+
+                if (last == "отлично" || last == "хорошо" || last == "удовлетворительно")
+                {
+                    quality = parts[^1];
+                    teacher = string.Join(" ", parts, 2, parts.Length - 3);
+                }
+            }
+
+            // Проверка преподавателя
             if (!IsValidTeacherName(teacher))
                 throw new ArgumentException($"Неверный формат ФИО преподавателя: {teacher}");
 
-            return new Lesson(date, audience, teacher);
+            return new Lesson(date, audience, teacher, quality);
         }
 
         private static bool IsValidTeacherName(string name)

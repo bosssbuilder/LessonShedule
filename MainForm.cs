@@ -24,7 +24,7 @@ namespace LessonScheduleNew
         private void SetupUI()
         {
             Text = "Учебные занятия - Вариант 9";
-            Size = new Size(850, 550);
+            Size = new Size(900, 550);
 
             _dataGridView = new DataGridView
             {
@@ -35,9 +35,11 @@ namespace LessonScheduleNew
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 MultiSelect = false
             };
+
             _dataGridView.Columns.Add("Date", "Дата");
             _dataGridView.Columns.Add("Audience", "Аудитория");
             _dataGridView.Columns.Add("Teacher", "Преподаватель");
+            _dataGridView.Columns.Add("Quality", "Качество"); // 🔥 ДОБАВИЛИ
 
             var topPanel = new Panel { Dock = DockStyle.Top, Height = 40 };
 
@@ -94,10 +96,17 @@ namespace LessonScheduleNew
         {
             _dataGridView.Rows.Clear();
             var lessons = _service.GetAll();
+
             foreach (var lesson in lessons)
             {
-                _dataGridView.Rows.Add(lesson.Date.ToString("yyyy.MM.dd"), lesson.Audience, lesson.Teacher);
+                _dataGridView.Rows.Add(
+                    lesson.Date.ToString("yyyy.MM.dd"),
+                    lesson.Audience,
+                    lesson.Teacher,
+                    lesson.Quality // 🔥 ДОБАВИЛИ
+                );
             }
+
             _lblStatus.Text = $"Всего записей: {lessons.Count}";
         }
 
