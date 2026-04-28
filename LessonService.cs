@@ -13,13 +13,14 @@ namespace LessonScheduleNew
 
         public void SetLessons(IEnumerable<Lesson> lessons)
         {
+            if (lessons is null) throw new ArgumentNullException(nameof(lessons));
             _lessons = lessons.ToList();
             OnDataChanged();
         }
 
         public void Add(Lesson lesson)
         {
-            if (lesson == null) throw new ArgumentNullException(nameof(lesson));
+            if (lesson is null) throw new ArgumentNullException(nameof(lesson));
             _lessons.Add(lesson);
             OnDataChanged();
         }

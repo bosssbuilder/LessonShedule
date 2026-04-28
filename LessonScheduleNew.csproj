@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
+		<StartupObject>LessonScheduleNew.Program</StartupObject>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows</TargetFramework>
 		<Nullable>enable</Nullable>
@@ -8,6 +9,11 @@
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
 		<AnalysisMode>All</AnalysisMode>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-
+	
 	</PropertyGroup>
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.4.0" />
+	  <PackageReference Include="NUnit" Version="4.5.1" />
+	  <PackageReference Include="NUnit3TestAdapter" Version="6.2.0" />
+	</ItemGroup>
 </Project>

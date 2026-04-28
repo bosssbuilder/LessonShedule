@@ -8,11 +8,12 @@ namespace LessonScheduleNew
     {
         public Lesson? Lesson { get; private set; }
 
-        private readonly TextBox _txtDate;
-        private readonly TextBox _txtAudience;
-        private readonly TextBox _txtTeacher;
-        private readonly Button _btnOk;
-        private readonly Button _btnCancel;
+        private TextBox _txtDate;
+        private TextBox _txtAudience;
+        private TextBox _txtTeacher;
+        private TextBox _txtQuality;
+        private Button _btnOk;
+        private Button _btnCancel;
 
         public AddLessonDialog()
         {
@@ -28,7 +29,7 @@ namespace LessonScheduleNew
         private void SetupUI()
         {
             Text = "Добавить занятие";
-            Size = new Size(420, 220);
+            Size = new Size(450, 280);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
@@ -38,48 +39,59 @@ namespace LessonScheduleNew
             {
                 Text = "Дата (ГГГГ.ММ.ДД):",
                 Location = new Point(15, 25),
-                Size = new Size(120, 23)
+                Size = new Size(130, 23)
             };
 
             Label lblAudience = new Label
             {
                 Text = "Аудитория:",
                 Location = new Point(15, 55),
-                Size = new Size(120, 23)
+                Size = new Size(130, 23)
             };
 
             Label lblTeacher = new Label
             {
                 Text = "Преподаватель:",
                 Location = new Point(15, 85),
-                Size = new Size(120, 23)
+                Size = new Size(130, 23)
             };
 
-            _txtDate.Location = new Point(150, 22);
-            _txtDate.Size = new Size(230, 23);
+            Label lblQuality = new Label
+            {
+                Text = "Качество (отлично/хорошо):",
+                Location = new Point(15, 115),
+                Size = new Size(180, 23)
+            };
+
+            _txtDate.Location = new Point(200, 22);
+            _txtDate.Size = new Size(200, 23);
             _txtDate.Text = DateTime.Now.ToString("yyyy.MM.dd");
 
-            _txtAudience.Location = new Point(150, 52);
-            _txtAudience.Size = new Size(230, 23);
+            _txtAudience.Location = new Point(200, 52);
+            _txtAudience.Size = new Size(200, 23);
 
-            _txtTeacher.Location = new Point(150, 82);
-            _txtTeacher.Size = new Size(230, 23);
+            _txtTeacher.Location = new Point(200, 82);
+            _txtTeacher.Size = new Size(200, 23);
+
+            _txtQuality.Location = new Point(200, 112);
+            _txtQuality.Size = new Size(200, 23);
+            _txtQuality.Text = "отлично";
 
             _btnOk.Text = "OK";
-            _btnOk.Location = new Point(220, 130);
+            _btnOk.Location = new Point(230, 160);
             _btnOk.Size = new Size(75, 30);
             _btnOk.DialogResult = DialogResult.OK;
             _btnOk.Click += BtnOk_Click;
 
             _btnCancel.Text = "Отмена";
-            _btnCancel.Location = new Point(305, 130);
+            _btnCancel.Location = new Point(315, 160);
             _btnCancel.Size = new Size(75, 30);
             _btnCancel.DialogResult = DialogResult.Cancel;
 
             Controls.AddRange(new Control[]
             {
-                lblDate, lblAudience, lblTeacher,
-                _txtDate, _txtAudience, _txtTeacher,
+                lblDate, lblAudience, lblTeacher, lblQuality,
+                _txtDate, _txtAudience, _txtTeacher, _txtQuality,
                 _btnOk, _btnCancel
             });
         }
@@ -89,7 +101,7 @@ namespace LessonScheduleNew
             try
             {
                 DateTime date = DateTime.ParseExact(_txtDate.Text, "yyyy.MM.dd", null);
-                Lesson = new Lesson(date, _txtAudience.Text.Trim(), _txtTeacher.Text.Trim());
+                Lesson = new Lesson(date, _txtAudience.Text.Trim(), _txtTeacher.Text.Trim(), _txtQuality.Text.Trim());
             }
             catch (Exception ex)
             {
@@ -105,6 +117,7 @@ namespace LessonScheduleNew
                 _txtDate?.Dispose();
                 _txtAudience?.Dispose();
                 _txtTeacher?.Dispose();
+                _txtQuality?.Dispose();
                 _btnOk?.Dispose();
                 _btnCancel?.Dispose();
             }

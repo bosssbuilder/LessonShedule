@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -12,6 +11,7 @@ namespace LessonScheduleNew
         private Button _btnLoad;
         private Button _btnAdd;
         private Button _btnDelete;
+        private Button _btnExecuteCommands;
         private Label _lblStatus;
 
         public MainForm()
@@ -24,7 +24,7 @@ namespace LessonScheduleNew
         private void SetupUI()
         {
             Text = "Учебные занятия - Вариант 9";
-            Size = new Size(750, 550);
+            Size = new Size(850, 550);
 
             _dataGridView = new DataGridView
             {
@@ -39,34 +39,42 @@ namespace LessonScheduleNew
             _dataGridView.Columns.Add("Audience", "Аудитория");
             _dataGridView.Columns.Add("Teacher", "Преподаватель");
 
-            Panel topPanel = new Panel { Dock = DockStyle.Top, Height = 40 };
+            var topPanel = new Panel { Dock = DockStyle.Top, Height = 40 };
 
             _btnLoad = new Button
             {
                 Text = "Загрузить из файла",
                 Location = new Point(10, 8),
-                Size = new Size(150, 28)
+                Size = new Size(130, 28)
             };
 
             _btnAdd = new Button
             {
                 Text = "Добавить",
-                Location = new Point(170, 8),
+                Location = new Point(150, 8),
                 Size = new Size(100, 28)
             };
 
             _btnDelete = new Button
             {
                 Text = "Удалить",
-                Location = new Point(280, 8),
+                Location = new Point(260, 8),
                 Size = new Size(100, 28)
+            };
+
+            _btnExecuteCommands = new Button
+            {
+                Text = "Выполнить команды",
+                Location = new Point(370, 8),
+                Size = new Size(150, 28)
             };
 
             _btnLoad.Click += BtnLoad_Click;
             _btnAdd.Click += BtnAdd_Click;
             _btnDelete.Click += BtnDelete_Click;
+            _btnExecuteCommands.Click += BtnExecuteCommands_Click;
 
-            topPanel.Controls.AddRange(new Control[] { _btnLoad, _btnAdd, _btnDelete });
+            topPanel.Controls.AddRange(new Control[] { _btnLoad, _btnAdd, _btnDelete, _btnExecuteCommands });
 
             _lblStatus = new Label
             {
@@ -105,7 +113,7 @@ namespace LessonScheduleNew
             {
                 try
                 {
-                    (List<Lesson> lessons, List<ParseError> errors) = LessonParser.LoadFromFileWithLog(ofd.FileName);
+                    var (lessons, errors) = LessonParser.LoadFromFileWithLog(ofd.FileName);
                     _service.SetLessons(lessons);
 
                     if (errors.Count > 0)
@@ -157,6 +165,25 @@ namespace LessonScheduleNew
             }
         }
 
+        private void BtnExecuteCommands_Click(object? sender, EventArgs e)
+        {
+            using OpenFileDialog ofd = new OpenFileDialog
+            {
+                Filter = "Command files|*.txt|All files|*.*",
+                Title = "Выберите файл с командами"
+            };
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                var parser = new CommandParser(_service);
+                var log = parser.ExecuteCommands(ofd.FileName);
+                RefreshGrid();
+
+                string logMessage = string.Join(Environment.NewLine, log);
+                MessageBox.Show(logMessage, "Результат выполнения команд", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -165,6 +192,7 @@ namespace LessonScheduleNew
                 _btnLoad?.Dispose();
                 _btnAdd?.Dispose();
                 _btnDelete?.Dispose();
+                _btnExecuteCommands?.Dispose();
                 _lblStatus?.Dispose();
             }
             base.Dispose(disposing);
