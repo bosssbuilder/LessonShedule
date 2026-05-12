@@ -22,6 +22,7 @@ namespace LessonScheduleNew
             _txtTeacher = new TextBox();
             _btnOk = new Button();
             _btnCancel = new Button();
+            _txtQuality = new TextBox();
 
             SetupUI();
         }
